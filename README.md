@@ -89,7 +89,7 @@ technical-test/
 ### Pasos
 ```bash
 # 1. Clonar el repositorio
-git clone <url-repositorio>
+git clone https://github.com/xlArg3lx/technical-test
 cd technical-test
 
 # 2. Levantar todos los servicios
