@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   postgres-clientes:
@@ -77,6 +75,12 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/api/clientes || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
     networks:
       - microservices-net
 
@@ -100,8 +104,30 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/api/cuentas || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
     networks:
       - microservices-net
+
+  k6:
+    image: grafana/k6:latest
+    container_name: k6
+    volumes:
+      - ./k6:/scripts
+    command: run /scripts/test-rendimiento.js
+    depends_on:
+      ms-clientes:
+        condition: service_healthy
+      ms-cuentas:
+        condition: service_healthy
+    networks:
+      - microservices-net
+    profiles:
+      - testing
 
 volumes:
   pgdata-clientes:
